@@ -1,23 +1,13 @@
 #include "context.h"
 
-void Context::executeStrategy(const QString &path) {
+QMap<QString, qint64> Context::executeStrategy(const QString &path) {
+    QMap<QString, qint64> results;
+
     if (strategy == nullptr) {
-        qWarning() << "Strategy not set.";
-        return;
+        return results;
     }
 
-    QMap<QString, qint64> results = strategy->analyze(path);
-    qint64 totalSize = results.value("totalSize");
+    results = strategy->analyze(path);
 
-    if (totalSize == 0) {
-        qWarning() << "The directory is empty or does not exist or all files are zero-sized.";
-        return;
-    }
-
-    for (auto it = results.begin(); it != results.end(); ++it) {
-        if (it.key() != "totalSize") {
-            double percentage = 100.0 * it.value() / totalSize;
-            qDebug() << it.key() << "size:" << it.value() << "bytes, percentage:" << percentage << "%";
-        }
-    }
+    return results;
 }

@@ -8,7 +8,7 @@ public:
     QMap<QString, qint64> analyze(const QString &path) const override;
 
 private:
-    void calculateFileTypeSizes(const QString &path, QMap<QString, qint64> &fileTypeSizes, qint64& totalSize) const;
+    void calculateFileTypeSizes(const QString &path, QMap<QString, qint64> &fileTypeSizes) const;
 };
 
 #endif // FILETYPESIZESTRATEGY_H

@@ -23,8 +23,6 @@ qint64 FolderSizeStrategy::calculateFolderSize(const QString &path) const {
 QMap<QString, qint64> FolderSizeStrategy::calculateFolderSizes(const QString &path) const {
     QMap<QString, qint64> folderSizes;
     qint64 currentDirectorySize = 0;
-    qint64 totalSize = 0;
-
     QDir dir(path);
 
     QFileInfoList entries = dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
@@ -32,19 +30,12 @@ QMap<QString, qint64> FolderSizeStrategy::calculateFolderSizes(const QString &pa
     for (const QFileInfo &entry : entries) {
         if (entry.isDir()) {
             qint64 subfolderSize = calculateFolderSize(entry.absoluteFilePath());
-            if(subfolderSize){
-                folderSizes.insert(entry.fileName(), subfolderSize);
-                totalSize += subfolderSize;
-            }
+            folderSizes.insert(entry.fileName(), subfolderSize);
         } else if (entry.isFile()) {
             currentDirectorySize += entry.size();
-            totalSize += entry.size();
         }
     }
 
-    if(currentDirectorySize){
-        folderSizes.insert("(CurrentDirectory)", currentDirectorySize);
-    }
-    folderSizes.insert("totalSize", totalSize);
+    folderSizes.insert("(CurrentDirectory)", currentDirectorySize);
     return folderSizes;
 }

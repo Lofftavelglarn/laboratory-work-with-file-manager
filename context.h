@@ -8,7 +8,7 @@ public:
         this->strategy = strategy;
     }
 
-    void executeStrategy(const QString &path);
+    QMap<QString, qint64> executeStrategy(const QString &path);
 
 private:
     IAnalyzerStrategy* strategy = nullptr;

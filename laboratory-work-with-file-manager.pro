@@ -11,8 +11,8 @@ SOURCES += \
         context.cpp \
         filetypesizestrategy.cpp \
         foldersizestrategy.cpp \
-        ianalyzerstrategy.cpp \
-        main.cpp
+        main.cpp \
+        mainwindow.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -23,4 +23,7 @@ HEADERS += \
     context.h \
     filetypesizestrategy.h \
     foldersizestrategy.h \
-    ianalyzerstrategy.h
+    ianalyzerstrategy.h \
+    mainwindow.h
+
+QT += widgets

@@ -1,7 +1,6 @@
 #ifndef FOLDERSIZESTRATEGY_H
 #define FOLDERSIZESTRATEGY_H
 
-
 #include "ianalyzerstrategy.h"
 
 class FolderSizeStrategy : public IAnalyzerStrategy {

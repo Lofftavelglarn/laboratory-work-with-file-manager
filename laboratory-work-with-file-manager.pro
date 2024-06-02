@@ -11,7 +11,6 @@ SOURCES += \
         context.cpp \
         filetypesizestrategy.cpp \
         foldersizestrategy.cpp \
-        ianalyzerstrategy.cpp \
         main.cpp
 
 # Default rules for deployment.

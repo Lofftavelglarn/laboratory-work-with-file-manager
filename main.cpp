@@ -6,7 +6,7 @@
 int main(int argc, char *argv[]) {
     QCoreApplication a(argc, argv);
 
-    QString path = R"(C:\Users\makar\repos\laboratory-work-with-file-manager\test\xd7)";
+    QString path = R"(C:\Users\makar\repos\laboratory-work-with-file-manager\test)";
 
     FolderSizeStrategy folderSizeStrategy;
     FileTypeSizeStrategy fileTypeSizeStrategy;

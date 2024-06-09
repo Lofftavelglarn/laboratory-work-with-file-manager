@@ -4,112 +4,109 @@
 #include <QHeaderView>
 #include <QStatusBar>
 #include <QDebug>
+#include <QStandardItem>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), context(std::make_unique<Context>())
 {
     this->setGeometry(100, 100, 1500, 500);
     this->setStatusBar(new QStatusBar(this));
-    this->statusBar()->showMessage("Choosen Path: ");
+    this->statusBar()->showMessage("Chosen Path: ");
     QString homePath = QDir::homePath();
 
     dirModel = new QFileSystemModel(this);
     dirModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
     dirModel->setRootPath(homePath);
 
-    fileModel = new QFileSystemModel(this);
-    fileModel->setFilter(QDir::NoDotAndDotDot | QDir::Files);
-    fileModel->setRootPath(homePath);
-
     treeView = new QTreeView();
     treeView->setModel(dirModel);
     treeView->expandAll();
 
-    QSplitter *splitter = new QSplitter(this);
-    tableView = new QTableView;
-    tableView->setModel(fileModel);
+    treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
+    analysisModel = new QStandardItemModel(this);
+    analysisModel->setHorizontalHeaderLabels(QStringList() << "Name" << "Size" << "Percentage");
+
+    analysisTableView = new QTableView;
+    analysisTableView->setModel(analysisModel);
+    analysisTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    QSplitter *splitter = new QSplitter(this);
     splitter->addWidget(treeView);
-    splitter->addWidget(tableView);
+    splitter->addWidget(analysisTableView);
+
     setCentralWidget(splitter);
 
     QItemSelectionModel *selectionModel = treeView->selectionModel();
-    QModelIndex indexHomePath = dirModel->index(homePath);
-    QFileInfo fileInfo = dirModel->fileInfo(indexHomePath);
 
-    treeView->header()->resizeSection(0, 200);
     connect(selectionModel, &QItemSelectionModel::selectionChanged,
             this, &MainWindow::on_selectionChangedSlot);
 
-    QItemSelection toggleSelection;
-    QModelIndex topLeft;
-    topLeft = dirModel->index(homePath);
-    dirModel->setRootPath(homePath);
+    treeView->resizeColumnToContents(0);
+}
 
-    toggleSelection.select(topLeft, topLeft);
-    selectionModel->select(toggleSelection, QItemSelectionModel::Toggle);
-
-    // Устанавливаем начальную стратегию
-    setFolderSizeStrategy();
+void MainWindow::setAnalysisStrategy(std::unique_ptr<IAnalyzerStrategy> strategy) {
+    context->setStrategy(std::move(strategy));
 }
 
 void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected) {
     Q_UNUSED(deselected);
-    QModelIndex index = treeView->selectionModel()->currentIndex();
     QModelIndexList indexes = selected.indexes();
     QString filePath = "";
 
     if (indexes.count() >= 1) {
         QModelIndex ix = indexes.constFirst();
         filePath = dirModel->filePath(ix);
-        this->statusBar()->showMessage("Choosen Path: " + filePath);
+        this->statusBar()->showMessage("Chosen Path: " + filePath);
 
         QMap<QString, qint64> folderSizes = context->executeStrategy(filePath);
-        if(folderSizes.empty()){
+        if (folderSizes.empty()) {
             qWarning() << "The strategy is not set!";
         } else {
+            analysisModel->clear();
+
             qint64 totalSize = 0;
-            qint64 otherSize = 0;
-            int alpha = 0;
 
             for (auto it = folderSizes.begin(); it != folderSizes.end(); ++it) {
-                if (it.value() < alpha) {
-                    otherSize += it.value();
-                    folderSizes.erase(it);
-                }
                 totalSize += it.value();
             }
-            if(otherSize) {
-                folderSizes.insert("otherSize", otherSize);
+
+            bool otherExist = false;
+            qint64 otherSize = 0;
+            const double alpha = 1.0;
+
+            QList<QString> otherFolders;
+
+            if(totalSize){
+                for (auto it = folderSizes.begin(); it != folderSizes.end(); ++it) {
+                    if(it.key() != "(CurrentDirectory)"){
+                        double percentage = 100.0 * it.value() / totalSize;
+                        if (percentage < alpha) {
+                            otherFolders.append(it.key());
+                            otherSize += it.value();
+                            otherExist = true;
+                        }
+                    }
+                }
             }
 
-            if(!totalSize){
-                qWarning() << "The directory is empty or does not exist or all files are zero-sized.";
-                qDebug() << "(Current Directory)" << "size:" << 0 << "bytes, percentage:" << 0 << "%";
-            } else {
-                for (auto it = folderSizes.begin(); it != folderSizes.end(); ++it) {
-                    double percentage = 100.0 * it.value() / totalSize;
-                    qDebug() << it.key() << "size:" << it.value() << "bytes, percentage:" << percentage << "%";
+            if (otherExist) {
+                folderSizes.insert("Other dirs", otherSize);
+                for (const QString &key : otherFolders) {
+                    folderSizes.remove(key);
                 }
+            }
+
+            for (auto it = folderSizes.begin(); it != folderSizes.end(); ++it) {
+                QList<QStandardItem *> rowItems;
+                double percentage = (totalSize == 0) ? 0.0 : (100.0 * it.value() / totalSize);
+                rowItems << new QStandardItem(it.key())
+                         << new QStandardItem(QString::number(it.value()))
+                         << new QStandardItem(QString::number(percentage, 'f', 2) + "%");
+                analysisModel->appendRow(rowItems);
             }
         }
     }
-    int length = 200;
-    int dx = 30;
 
-    if (dirModel->fileName(index).length() * dx > length) {
-        length = length + dirModel->fileName(index).length() * dx;
-        qDebug() << "r = " << index.row() << "c = " << index.column() << dirModel->fileName(index) << dirModel->fileInfo(index).size();
-    }
-
-    treeView->header()->resizeSection(index.column(), length + dirModel->fileName(index).length());
-    tableView->setRootIndex(fileModel->setRootPath(filePath));
-}
-
-void MainWindow::setFolderSizeStrategy() {
-    context->setStrategy(std::make_unique<FolderSizeStrategy>());
-}
-
-void MainWindow::setFileTypeSizeStrategy() {
-    context->setStrategy(std::make_unique<FileTypeSizeStrategy>());
+    treeView->resizeColumnToContents(0);
 }

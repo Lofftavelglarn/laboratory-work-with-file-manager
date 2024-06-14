@@ -8,6 +8,7 @@
 #include "context.h"
 #include "filetypesizestrategy.h"
 #include "foldersizestrategy.h"
+#include <QComboBox>
 #include <memory>
 #include <QStandardItemModel>
 
@@ -17,10 +18,10 @@ class MainWindow : public QMainWindow {
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    void setAnalysisStrategy(std::unique_ptr<IAnalyzerStrategy> strategy);
 
 private slots:
     void on_selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected);
+    void on_strategyChangedSlot(const QString &strategyName);
 
 private:
     QFileSystemModel *dirModel;
@@ -28,6 +29,11 @@ private:
     std::unique_ptr<Context> context;
     QStandardItemModel *analysisModel;
     QTableView *analysisTableView;
+    QComboBox *strategyComboBox;
+
+    void setFolderSizeStrategy();
+    void setFileTypeSizeStrategy();
+    void setAnalysisStrategy(std::unique_ptr<IAnalyzerStrategy> strategy);
 };
 
 #endif // MAINWINDOW_H

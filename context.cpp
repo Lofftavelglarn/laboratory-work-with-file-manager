@@ -3,11 +3,11 @@
 QMap<QString, qint64> Context::executeStrategy(const QString &path) {
     QMap<QString, qint64> results;
 
-    if (strategy == nullptr) {
-        return results;
+    if (strategy) {
+        results = strategy->analyze(path);
+    } else {
+        qWarning() << "The strategy is not set!";
     }
-
-    results = strategy->analyze(path);
 
     return results;
 }

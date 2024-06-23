@@ -5,13 +5,21 @@
 #include <QFileSystemModel>
 #include <QTreeView>
 #include <QTableView>
+#include <QSplitter>
+#include <QVBoxLayout>
+#include <QStatusBar>
+#include <QComboBox>
+#include <QItemSelectionModel>
+#include <memory>
+
 #include "analysistablemodel.h"
 #include "context.h"
 #include "filetypesizestrategy.h"
 #include "foldersizestrategy.h"
-#include <QComboBox>
-#include <memory>
-#include <QStandardItemModel>
+#include "barchart.h"
+#include "piechart.h"
+#include "barchartadapter.h"
+#include "piechartadapter.h"
 
 
 class MainWindow : public QMainWindow {
@@ -23,6 +31,7 @@ public:
 private slots:
     void on_selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected);
     void on_strategyChangedSlot(const QString &strategyName);
+    void on_viewModeChangedSlot(const QString &viewMode);
 
 private:
     QFileSystemModel *dirModel;
@@ -31,10 +40,20 @@ private:
     AnalysisTableModel *analysisTableModel;
     QTableView *analysisTableView;
     QComboBox *strategyComboBox;
+    QComboBox *viewModeComboBox;
+    QSplitter *splitter;
+
+    BarChart *barChart;
+    PieChart *pieChart;
+    BarChartAdapter *barChartAdapter;
+    PieChartAdapter *pieChartAdapter;
 
     void setFolderSizeStrategy();
     void setFileTypeSizeStrategy();
     void setAnalysisStrategy(std::unique_ptr<IAnalyzerStrategy> strategy);
+
+    void updateView(const QMap<QString, qint64> &data);
+    QWidget *currentView;
 };
 
 #endif // MAINWINDOW_H

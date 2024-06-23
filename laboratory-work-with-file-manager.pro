@@ -9,11 +9,13 @@ CONFIG -= app_bundle
 
 SOURCES += \
         analysistablemodel.cpp \
+        barchart.cpp \
         context.cpp \
         filetypesizestrategy.cpp \
         foldersizestrategy.cpp \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+        piechart.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -22,10 +24,17 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     analysistablemodel.h \
+    barchart.h \
+    barchartadapter.h \
+    chart.h \
     context.h \
+    contextobserver.h \
     filetypesizestrategy.h \
     foldersizestrategy.h \
     ianalyzerstrategy.h \
-    mainwindow.h
+    mainwindow.h \
+    piechart.h \
+    piechartadapter.h
 
 QT += widgets
+QT += charts

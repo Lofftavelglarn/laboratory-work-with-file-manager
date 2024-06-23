@@ -10,7 +10,7 @@ public:
 private:
     qint64 calculateFolderSize(const QString &path) const;
 
-    QMap<QString, qint64> calculateFolderSizes(const QString &path) const;
+    QMap<QString, qint64> calculateFolderSizes(const QString &path, QMap<QString, qint64> folderSizes) const;
 };
 
 #endif // FOLDERSIZESTRATEGY_H

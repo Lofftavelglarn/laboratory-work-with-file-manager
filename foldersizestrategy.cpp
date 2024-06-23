@@ -1,7 +1,9 @@
 #include "foldersizestrategy.h"
 
 QMap<QString, qint64> FolderSizeStrategy::analyze(const QString &path) const  {
-    return calculateFolderSizes(path);
+    QMap<QString, qint64> folderSizes;
+    calculateFolderSizes(path, folderSizes);
+    return folderSizes;
 }
 
 qint64 FolderSizeStrategy::calculateFolderSize(const QString &path) const {
@@ -20,8 +22,7 @@ qint64 FolderSizeStrategy::calculateFolderSize(const QString &path) const {
     return size;
 }
 
-QMap<QString, qint64> FolderSizeStrategy::calculateFolderSizes(const QString &path) const {
-    QMap<QString, qint64> folderSizes;
+QMap<QString, qint64> FolderSizeStrategy::calculateFolderSizes(const QString &path, QMap<QString, qint64> folderSizes) const {
     qint64 currentDirectorySize = 0;
     QDir dir(path);
 

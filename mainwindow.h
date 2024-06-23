@@ -5,6 +5,7 @@
 #include <QFileSystemModel>
 #include <QTreeView>
 #include <QTableView>
+#include "analysistablemodel.h"
 #include "context.h"
 #include "filetypesizestrategy.h"
 #include "foldersizestrategy.h"
@@ -27,7 +28,7 @@ private:
     QFileSystemModel *dirModel;
     QTreeView *treeView;
     std::unique_ptr<Context> context;
-    QStandardItemModel *analysisModel;
+    AnalysisTableModel *analysisTableModel;
     QTableView *analysisTableView;
     QComboBox *strategyComboBox;
 

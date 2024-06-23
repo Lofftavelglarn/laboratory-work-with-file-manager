@@ -24,11 +24,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-    analysisModel = new QStandardItemModel(this);
-    analysisModel->setHorizontalHeaderLabels(QStringList() << "Name" << "Size" << "Percentage");
+    analysisTableModel = new AnalysisTableModel(this);
 
     analysisTableView = new QTableView;
-    analysisTableView->setModel(analysisModel);
+    analysisTableView->setModel(analysisTableModel);
     analysisTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     strategyComboBox = new QComboBox(this);
@@ -68,49 +67,8 @@ void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const Q
         this->statusBar()->showMessage("Chosen Path: " + filePath);
 
         QMap<QString, qint64> folderSizes = context->executeStrategy(filePath);
-        analysisModel->clear();
-        analysisModel->setHorizontalHeaderLabels(QStringList() << "Name" << "Size" << "Percentage");
 
-        qint64 totalSize = 0;
-
-        for (auto it = folderSizes.begin(); it != folderSizes.end(); ++it) {
-            totalSize += it.value();
-        }
-
-        bool otherExist = false;
-        qint64 otherSize = 0;
-        const double alpha = 1.0;
-
-        QList<QString> otherFolders;
-
-        if(totalSize){
-            for (auto it = folderSizes.begin(); it != folderSizes.end(); ++it) {
-                if(it.key() != "(CurrentDirectory)"){
-                    double percentage = 100.0 * it.value() / totalSize;
-                    if (percentage < alpha) {
-                        otherFolders.append(it.key());
-                        otherSize += it.value();
-                        otherExist = true;
-                    }
-                }
-            }
-        }
-
-        if (otherExist) {
-            folderSizes.insert("Other dirs", otherSize);
-            for (const QString &key : otherFolders) {
-                folderSizes.remove(key);
-            }
-        }
-
-        for (auto it = folderSizes.begin(); it != folderSizes.end(); ++it) {
-            QList<QStandardItem *> rowItems;
-            double percentage = (totalSize == 0) ? 0.0 : (100.0 * it.value() / totalSize);
-            rowItems << new QStandardItem(it.key())
-                     << new QStandardItem(QString::number(it.value()))
-                     << new QStandardItem(QString::number(percentage, 'f', 2) + "%");
-            analysisModel->appendRow(rowItems);
-        }
+        analysisTableModel->setAnalysisData(folderSizes);
     }
 
     treeView->resizeColumnToContents(0);

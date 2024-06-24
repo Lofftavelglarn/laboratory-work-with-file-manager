@@ -9,8 +9,13 @@ class PieChartAdapter : public ContextObserver {
 public:
     explicit PieChartAdapter(PieChart *pieChart) : pieChart(pieChart) {}
 
-    virtual void update(const QMap<QString, qint64> &data) override {
-        pieChart->createChart(data);
+    void update(const QMap<QString, qint64> &data) override {
+        QMap<QString, qreal> dataPercent = makePercent(data);
+        pieChart->createChart(dataPercent);
+    }
+
+    PieChart* getChart(){
+        return pieChart;
     }
 
 private:

@@ -1,10 +1,10 @@
 #include "piechart.h"
 
-void PieChart::drawChart(const QMap<QString, qint64> &data) {
+void PieChart::drawChart(const QMap<QString, qreal> &data) {
     QPieSeries *series = new QPieSeries();
 
     for (auto it = data.constBegin(); it != data.constEnd(); ++it) {
-        series->append(it.key(), it.value());
+        series->append(it.key() + QString("\n") + QString::number(it.value()), it.value());
     }
 
     chartView->chart()->addSeries(series);

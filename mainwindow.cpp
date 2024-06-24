@@ -1,9 +1,14 @@
 #include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), context(std::make_unique<Context>()),
-      analysisTableModel(new AnalysisTableModel(this)), splitter(new QSplitter(this)),
-      barChart(new BarChart(this)), pieChart(new PieChart(this)), barChartAdapter(new BarChartAdapter(barChart)), pieChartAdapter(new PieChartAdapter(pieChart)), currentView(nullptr)
+    : QMainWindow(parent),
+      context(std::make_unique<Context>()),
+      analysisTableModel(new AnalysisTableModel(this)),
+      splitter(new QSplitter(this)),
+      barChart(new BarChart(this)),
+      pieChart(new PieChart(this)),
+      barChartAdapter(new BarChartAdapter(barChart)),
+      pieChartAdapter(new PieChartAdapter(pieChart))
 {
     this->setGeometry(100, 100, 1500, 500);
     this->setStatusBar(new QStatusBar(this));
@@ -42,15 +47,14 @@ MainWindow::MainWindow(QWidget *parent)
     layout->addWidget(strategyComboBox);
     layout->addWidget(viewModeComboBox);
 
-    QWidget *widget = new QWidget(this);
-    widget->setLayout(layout);
-
     splitter->addWidget(treeView);
     splitter->addWidget(analysisTableView);
 
     layout->addWidget(splitter);
 
-    setCentralWidget(widget);
+    QWidget *centralWidget = new QWidget(this);
+    centralWidget->setLayout(layout);
+    setCentralWidget(centralWidget);
 
     QItemSelectionModel *selectionModel = treeView->selectionModel();
     connect(selectionModel, &QItemSelectionModel::selectionChanged,
@@ -58,8 +62,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     treeView->resizeColumnToContents(0);
     setFolderSizeStrategy();
+    currentView = analysisTableView;
     on_viewModeChangedSlot("Table");
 }
+
 
 void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected) {
     Q_UNUSED(deselected);
@@ -72,7 +78,6 @@ void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const Q
         this->statusBar()->showMessage("Chosen Path: " + filePath);
 
         QMap<QString, qint64> analysisResults = context->executeStrategy(filePath);
-        //updateView(analysisResults);
         analysisTableModel->setAnalysisData(analysisResults);
     }
 
@@ -104,39 +109,22 @@ void MainWindow::on_viewModeChangedSlot(const QString &viewMode) {
 
     if (viewMode == "Table") {
         newView = analysisTableView;
-        if (currentView != analysisTableView) {
-            analysisTableView->show();
-            barChart->hide();
-            pieChart->hide();
-        }
     } else if (viewMode == "Bar Chart") {
         newView = barChart;
-        if (currentView != barChart) {
-            analysisTableView->hide();
-            barChart->show();
-            pieChart->hide();
-        }
     } else if (viewMode == "Pie Chart") {
         newView = pieChart;
-        if (currentView != pieChart) {
-            analysisTableView->hide();
-            barChart->hide();
-            pieChart->show();
-        }
     }
 
     if (newView && newView != currentView) {
-        splitter->replaceWidget(1, newView);
+        if (splitter->count() > 1) {
+            QWidget *oldView = splitter->widget(1);
+            splitter->replaceWidget(1, newView);
+            oldView->hide();
+        } else {
+            splitter->addWidget(newView);
+        }
+
+        newView->show();
         currentView = newView;
     }
 }
-
-/*void MainWindow::updateView(const QMap<QString, qint64> &data) {
-    if (currentView == analysisTableView) {
-        analysisTableModel->setAnalysisData(data);
-    } else if (currentView == barChart) {
-        barChartAdapter->update(data);
-    } else if (currentView == pieChart) {
-        pieChartAdapter->update(data);
-    }
-}*/

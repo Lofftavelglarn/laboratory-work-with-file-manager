@@ -17,6 +17,13 @@ public:
         observers.push_back(observer);
     }
 
+    void removeObserver(ContextObserver *observer) {
+        auto it = std::find(observers.begin(), observers.end(), observer);
+        if (it != observers.end()) {
+            observers.erase(it);
+        }
+    }
+
 private:
     std::unique_ptr<IAnalyzerStrategy> strategy = nullptr;
     QMap<QString, qint64> results;

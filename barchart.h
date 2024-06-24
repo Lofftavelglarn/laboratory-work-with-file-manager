@@ -10,7 +10,7 @@ class BarChart : public Chart {
 public:
     explicit BarChart(QWidget *parent = nullptr) : Chart(parent) {}
 
-    virtual void drawChart(const QMap<QString, qint64> &data) override;
+    virtual void drawChart(const QMap<QString, qreal> &data) override;
 
     virtual void drawLegend() override;
 };

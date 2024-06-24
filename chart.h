@@ -19,7 +19,7 @@ public:
 
     virtual ~Chart() = default;
 
-    void createChart(const QMap<QString, qint64> &data) {
+    void createChart(const QMap<QString, qreal> &data) {
         chartView->chart()->removeAllSeries();
         drawChart(data);
         drawLegend();
@@ -28,7 +28,7 @@ public:
 protected:
     QChartView *chartView;
 
-    virtual void drawChart(const QMap<QString, qint64> &data) = 0;
+    virtual void drawChart(const QMap<QString, qreal> &data) = 0;
     virtual void drawLegend() = 0;
 };
 

@@ -9,8 +9,13 @@ class BarChartAdapter : public ContextObserver {
 public:
     explicit BarChartAdapter(BarChart *barChart) : barChart(barChart) {}
 
-    virtual void update(const QMap<QString, qint64> &data) override {
-        barChart->createChart(data);
+    void update(const QMap<QString, qint64> &data) override {
+        QMap<QString, qreal> dataPercent = makePercent(data);
+        barChart->createChart(dataPercent);
+    }
+
+    BarChart* getChart(){
+        return barChart;
     }
 
 private:

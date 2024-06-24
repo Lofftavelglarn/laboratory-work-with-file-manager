@@ -52,7 +52,6 @@ private:
     void setFileTypeSizeStrategy();
     void setAnalysisStrategy(std::unique_ptr<IAnalyzerStrategy> strategy);
 
-    void updateView(const QMap<QString, qint64> &data);
     QWidget *currentView;
 };
 

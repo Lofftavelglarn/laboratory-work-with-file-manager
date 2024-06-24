@@ -102,6 +102,13 @@ void MainWindow::on_strategyChangedSlot(const QString &strategyName) {
     } else if (strategyName == "File Type Size") {
         setFileTypeSizeStrategy();
     }
+    QModelIndexList indexes = treeView->selectionModel()->selectedIndexes();
+    if (!indexes.isEmpty()) {
+        QModelIndex ix = indexes.constFirst();
+        QString filePath = dirModel->filePath(ix);
+        QMap<QString, qint64> analysisResults = context->executeStrategy(filePath);
+        analysisTableModel->setAnalysisData(analysisResults);
+    }
 }
 
 void MainWindow::on_viewModeChangedSlot(const QString &viewMode) {

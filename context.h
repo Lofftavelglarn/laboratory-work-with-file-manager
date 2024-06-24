@@ -24,16 +24,16 @@ public:
         }
     }
 
-private:
-    std::unique_ptr<IAnalyzerStrategy> strategy = nullptr;
-    QMap<QString, qint64> results;
-    std::vector<ContextObserver* > observers;
-
     void notifyObservers() {
         for (auto observer : observers) {
             observer->update(results);
         }
     }
+
+private:
+    std::unique_ptr<IAnalyzerStrategy> strategy = nullptr;
+    QMap<QString, qint64> results;
+    std::vector<ContextObserver* > observers;
 };
 
 #endif // CONTEXT_H

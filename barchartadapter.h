@@ -18,6 +18,10 @@ public:
         return barChart;
     }
 
+    ~BarChartAdapter(){
+        delete barChart;
+    }
+
 private:
     BarChart *barChart;
 };

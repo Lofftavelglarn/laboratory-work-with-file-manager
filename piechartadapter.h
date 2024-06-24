@@ -18,6 +18,10 @@ public:
         return pieChart;
     }
 
+    ~PieChartAdapter(){
+        delete pieChart;
+    }
+
 private:
     PieChart *pieChart;
 };

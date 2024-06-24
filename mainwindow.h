@@ -27,6 +27,23 @@ class MainWindow : public QMainWindow {
 
 public:
     MainWindow(QWidget *parent = nullptr);
+    ~MainWindow(){
+        context->removeObserver(barChartAdapter);
+        context->removeObserver(pieChartAdapter);
+        delete dirModel;
+        delete treeView;
+        delete analysisTableModel;
+        delete analysisTableView;
+        delete strategyComboBox;
+        delete viewModeComboBox;
+        delete splitter;
+
+        delete barChart;
+        delete pieChart;
+        delete barChartAdapter;
+        delete pieChartAdapter;
+
+    }
 
 private slots:
     void on_selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected);
